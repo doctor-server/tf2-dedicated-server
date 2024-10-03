@@ -1,27 +1,22 @@
-# This is a basic workflow to help you get started with Actions
 name: Publish Docker Image (GPR)
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
-jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: doctor-server/tf2-dedicated-server
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
 
       - name: Fetch JSON file
@@ -30,8 +25,67 @@ jobs:
       - name: Extract Remote buildid
         id: remote-buildid
         run: |
-          buildid=$(jq -r '.depots.branches.public.buildid' appinfo.json)
-          echo "::set-output name=buildid::$buildid"
+          remote_buildid=$(jq -r '.depots.branches.public.buildid' appinfo.json)
+          echo "remote_buildid=${remote_buildid}" >> $GITHUB_ENV
 
-      - name: Display buildid
-        run: echo "The build ID is ${{ steps.remote-buildid.outputs.buildid }}"
+      - name: Check if tag exists
+        id: tag-exists
+        run: |
+          if docker pull ghcr.io/doctor-server/tf2-dedicated-server:${{ env.remote_buildid }}; then
+            echo "exists=true" >> $GITHUB_ENV
+          else
+            echo "exists=false" >> $GITHUB_ENV
+
+      - name: Set up Docker Buildx
+        if: env.exists == 'false'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to the Container registry
+        if: env.exists == 'false'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        if: env.exists == 'false'
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+      - name: Build Docker image
+        if: env.exists == 'false'
+        id: build-image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: ${{ env.IMAGE_NAME }}:latest
+
+      - name: Run local buildid script
+        if: env.exists == 'false'
+        id: local-buildid
+        run: |
+          local_buildid=$(docker run --rm ${{ env.IMAGE_NAME }}:latest sh -c ./local_buildid.sh)
+          echo "local_buildid=${local_buildid}" >> $GITHUB_ENV
+
+      - name: Compare build IDs
+        if: env.exists == 'false'
+        run: |
+          if [ "${{ env.local_buildid }}" != "${{ env.remote_buildid }}" ]; then
+            echo "Local build ID does not match remote build ID. Failing the job."
+            exit 1
+          fi
+
+      - name: Push Docker image
+        if: env.exists == 'false' && env.local_buildid == env.remote_buildid
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:${{ env.remote_buildid }}
+          labels: ${{ steps.meta.outputs.labels }}
