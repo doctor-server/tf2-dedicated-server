@@ -19,6 +19,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Free up disk space
+        run: |
+          sudo rm -rf /usr/local/lib/android || true
+          sudo rm -rf /usr/share/dotnet || true
+
       - name: Fetch JSON file
         run: curl -s https://raw.githubusercontent.com/WindowsGSM/SteamAppInfo/refs/heads/main/AppInfo/232250.json -o appinfo.json
 
