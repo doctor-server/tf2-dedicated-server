@@ -35,6 +35,7 @@ jobs:
             echo "exists=true" >> $GITHUB_ENV
           else
             echo "exists=false" >> $GITHUB_ENV
+          fi
 
       - name: Set up Docker Buildx
         if: env.exists == 'false'
