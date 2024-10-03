@@ -62,14 +62,14 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: false
+          load: true
           tags: ${{ env.IMAGE_NAME }}:latest
 
       - name: Run local buildid script
         if: env.exists == 'false'
         id: local-buildid
         run: |
-          local_buildid=$(docker run --rm ${{ env.IMAGE_NAME }}:latest sh -c ./local_buildid.sh)
+          local_buildid=$(docker run --rm ${{ env.IMAGE_NAME }}:latest sh -c local_buildid.sh)
           echo "local_buildid=${local_buildid}" >> $GITHUB_ENV
 
       - name: Compare build IDs
