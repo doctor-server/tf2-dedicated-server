@@ -36,8 +36,8 @@ jobs:
       - name: Check if tag exists
         id: tag-exists
         run: |
-          TAG_EXISTS=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://ghcr.io/v2/${{ env.IMAGE_NAME }}/manifests/${{ env.remote_buildid }})
-          if [ $TAG_EXISTS -eq 200 ]; then
+          TAG_EXISTS=$(curl --head --fail -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://ghcr.io/v2/${{ env.IMAGE_NAME }}/manifests/${{ env.remote_buildid }} && echo "true" || echo "false")
+          if [ "$TAG_EXISTS" == "true" ]; then
             echo "exists=true" >> $GITHUB_ENV
           else
             echo "exists=false" >> $GITHUB_ENV
