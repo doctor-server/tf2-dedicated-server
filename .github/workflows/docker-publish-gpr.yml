@@ -17,11 +17,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Free up disk space
-        run: |
-          sudo rm -rf /usr/local/lib/android || true
-          sudo rm -rf /usr/share/dotnet || true
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -47,6 +42,11 @@ jobs:
           else
             echo "exists=false" >> $GITHUB_ENV
           fi
+
+      - name: Free up disk space
+        if: env.exists == 'false'
+        run: |
+          sudo rm -rf /usr/local/lib/android || true
 
       - name: Set up Docker Buildx
         if: env.exists == 'false'
