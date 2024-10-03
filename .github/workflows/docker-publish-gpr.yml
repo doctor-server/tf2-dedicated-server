@@ -64,7 +64,6 @@ jobs:
           context: .
           load: true
           tags: ${{ env.IMAGE_NAME }}:latest
-        timeout-minutes: 15
 
       - name: Run local buildid script
         if: env.exists == 'false'
