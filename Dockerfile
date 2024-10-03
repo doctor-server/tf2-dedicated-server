@@ -3,9 +3,10 @@ FROM steamcmd/steamcmd:ubuntu-22
 
 # Set environment variables for the user and home directory
 ENV USER=steam
-ENV HOME=/home/$USER
+ENV HOME=/home/${USER}
 
 # Update package lists and install necessary 32-bit libraries
+# Clean up to reduce image size
 RUN apt update && \
     apt install -y --no-install-recommends \
         lib32z1 \
@@ -16,27 +17,31 @@ RUN apt update && \
         libtinfo5:i386 \
         libcurl3-gnutls:i386 \
         libsdl2-2.0-0:i386 && \
-    # Clean up to reduce image size
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     # Create a new user with a home directory and bash shell
-    useradd --home-dir $HOME --create-home --shell /bin/bash $USER
+    useradd --home-dir ${HOME} --create-home --shell /bin/bash ${USER}
 
-# Copy the update script for Team Fortress 2 dedicated server
+# Copy the update script for Team Fortress 2 dedicated server to the home directory
 COPY update_tf2_ds.txt $HOME/update_tf2_ds.txt
 
 # Run the SteamCMD script to update the TF2 server
 RUN steamcmd +runscript $HOME/update_tf2_ds.txt
 
-# Copy the validate_buildid.sh script to the specified directory
+# Copy the validate_buildid.sh script to the home directory
 COPY validate_buildid.sh ${HOME}/validate_buildid.sh
+
+# Set the remote build ID as an argument and validate it
 ARG remote_buildid
 RUN chmod +x ${HOME}/validate_buildid.sh && ${HOME}/validate_buildid.sh ${remote_buildid}
 
-# Switch to the steam user
-USER $USER
+# Create a symbolic link to the TF2 server files for easier volume mounting
+RUN ln -s ${HOME}/serverfiles/tf /tf
+
+# Switch to the steam user for security reasons
+USER ${USER}
 
 # Set the working directory to the server files directory
-WORKDIR $HOME/serverfiles
+WORKDIR ${HOME}/serverfiles
 
 # Define an empty entrypoint to allow custom commands at runtime
 ENTRYPOINT []
