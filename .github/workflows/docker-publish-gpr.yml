@@ -41,7 +41,8 @@ jobs:
       - name: Check if tag exists
         id: tag-exists
         run: |
-          if docker pull ghcr.io/doctor-server/tf2-dedicated-server:${{ env.remote_buildid }}; then
+          TAG_EXISTS=$(curl -s -o /dev/null -w "%{http_code}" https://${{ env.REGISTRY }}/v2/${{ env.IMAGE_NAME }}/manifests/${{ env.remote_buildid }})
+          if [ $TAG_EXISTS -eq 200 ]; then
             echo "exists=true" >> $GITHUB_ENV
           else
             echo "exists=false" >> $GITHUB_ENV
