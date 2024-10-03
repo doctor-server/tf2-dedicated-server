@@ -14,7 +14,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
 
     steps:
       - uses: actions/checkout@v4
@@ -64,6 +64,7 @@ jobs:
           context: .
           load: true
           tags: ${{ env.IMAGE_NAME }}:latest
+        timeout-minutes: 15
 
       - name: Run local buildid script
         if: env.exists == 'false'
