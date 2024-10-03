@@ -43,10 +43,10 @@ jobs:
             echo "exists=false" >> $GITHUB_ENV
           fi
 
-      - name: Free up disk space
-        if: env.exists == 'false'
-        run: |
-          sudo rm -rf /usr/local/lib/android || true
+      # - name: Free up disk space
+      #   if: env.exists == 'false'
+      #   run: |
+      #     sudo rm -rf /usr/local/lib/android || true
 
       - name: Set up Docker Buildx
         if: env.exists == 'false'
