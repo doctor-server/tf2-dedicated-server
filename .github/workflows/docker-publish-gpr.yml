@@ -23,23 +23,24 @@ jobs:
         run: |
           df -h
           sudo rm -rf /usr/local/lib/android || true
-          df -h
           sudo rm -rf /usr/share/dotnet || true
           df -h
-          sudo apt-get remove -y google-cloud-sdk --fix-missing || echo "::debug::The command [sudo apt-get remove -y google-cloud-sdk --fix-missing] failed to complete successfully. Proceeding..."
-          sudo apt-get remove -y google-cloud-cli --fix-missing || echo "::debug::The command [sudo apt-get remove -y google-cloud-cli --fix-missing] failed to complete successfully. Proceeding..."
-          sudo apt-get autoremove -y || echo "::warning::The command [sudo apt-get autoremove -y] failed to complete successfully. Proceeding..."
-          sudo apt-get clean || echo "::warning::The command [sudo apt-get clean] failed to complete successfully. Proceeding..."
-          df -h
 
-      - name: Fetch JSON file
-        run: curl -s https://raw.githubusercontent.com/WindowsGSM/SteamAppInfo/refs/heads/main/AppInfo/232250.json -o appinfo.json
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
 
-      - name: Extract Remote buildid
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run remote_buildid.py and save output
         id: remote-buildid
         run: |
-          remote_buildid=$(jq -r '.depots.branches.public.buildid' appinfo.json)
-          echo "remote_buildid=${remote_buildid}" >> $GITHUB_ENV
+          remote_buildid=$(python remote_buildid.py)
+          echo "remote_buildid=$remote_buildid" >> $GITHUB_ENV
 
       - name: Check if tag exists
         id: tag-exists
@@ -69,32 +70,8 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      - name: Build Docker image
-        if: env.exists == 'false'
-        id: build-image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          load: true
-          tags: ${{ env.IMAGE_NAME }}:latest
-
-      - name: Run local buildid script
-        if: env.exists == 'false'
-        id: local-buildid
-        run: |
-          local_buildid=$(docker run --rm ${{ env.IMAGE_NAME }}:latest sh -c local_buildid.sh)
-          echo "local_buildid=${local_buildid}" >> $GITHUB_ENV
-
-      - name: Compare build IDs
-        if: env.exists == 'false'
-        run: |
-          if [ "${{ env.local_buildid }}" != "${{ env.remote_buildid }}" ]; then
-            echo "Local build ID does not match remote build ID. Failing the job."
-            exit 1
-          fi
-
       - name: Push Docker image
-        if: env.exists == 'false' && env.local_buildid == env.remote_buildid
+        if: env.exists == 'false'
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -103,3 +80,5 @@ jobs:
             ${{ env.IMAGE_NAME }}:latest
             ${{ env.IMAGE_NAME }}:${{ env.remote_buildid }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            remote_buildid=${{ env.remote_buildid }}

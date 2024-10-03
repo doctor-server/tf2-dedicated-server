@@ -5,9 +5,6 @@ FROM steamcmd/steamcmd:ubuntu-22
 ENV USER=steam
 ENV HOME=/home/$USER
 
-# Copy the local_buildid.sh script to the specified directory
-COPY local_buildid.sh /usr/local/bin/local_buildid.sh
-
 # Update package lists and install necessary 32-bit libraries
 RUN apt update && \
     apt install -y --no-install-recommends \
@@ -22,18 +19,18 @@ RUN apt update && \
     # Clean up to reduce image size
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     # Create a new user with a home directory and bash shell
-    useradd --home-dir $HOME --create-home --shell /bin/bash $USER && \
-    # Make the script executable
-    chmod +x /usr/local/bin/local_buildid.sh
-
-# Set the working directory to the user's home directory
-WORKDIR $HOME
+    useradd --home-dir $HOME --create-home --shell /bin/bash $USER
 
 # Copy the update script for Team Fortress 2 dedicated server
-COPY update_tf2_ds.txt $HOME
+COPY update_tf2_ds.txt $HOME/update_tf2_ds.txt
 
 # Run the SteamCMD script to update the TF2 server
 RUN steamcmd +runscript $HOME/update_tf2_ds.txt
+
+# Copy the validate_buildid.sh script to the specified directory
+COPY validate_buildid.sh ${HOME}/validate_buildid.sh
+ARG remote_buildid
+RUN chmod +x ${HOME}/validate_buildid.sh && ${HOME}/validate_buildid.sh ${remote_buildid}
 
 # Switch to the steam user
 USER $USER
