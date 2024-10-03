@@ -79,6 +79,5 @@ jobs:
           tags: |
             ${{ env.IMAGE_NAME }}:latest
             ${{ env.IMAGE_NAME }}:${{ env.remote_buildid }}
-          labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             remote_buildid=${{ env.remote_buildid }}
