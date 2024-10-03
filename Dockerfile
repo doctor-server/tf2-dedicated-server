@@ -22,10 +22,13 @@ RUN apt update && \
     useradd --home-dir ${HOME} --create-home --shell /bin/bash ${USER}
 
 # Copy the update script for Team Fortress 2 dedicated server to the home directory
-COPY update_tf2_ds.txt $HOME/update_tf2_ds.txt
+COPY update_tf2_ds.txt ${HOME}/update_tf2_ds.txt
 
 # Run the SteamCMD script to update the TF2 server
-RUN steamcmd +runscript $HOME/update_tf2_ds.txt
+RUN steamcmd +runscript ${HOME}/update_tf2_ds.txt
+
+# Create a symbolic link to the TF2 server files for easier volume mounting
+RUN ln -s ${HOME}/serverfiles/tf /tf
 
 # Copy the validate_buildid.sh script to the home directory
 COPY validate_buildid.sh ${HOME}/validate_buildid.sh
@@ -33,9 +36,6 @@ COPY validate_buildid.sh ${HOME}/validate_buildid.sh
 # Set the remote build ID as an argument and validate it
 ARG remote_buildid
 RUN chmod +x ${HOME}/validate_buildid.sh && ${HOME}/validate_buildid.sh ${remote_buildid}
-
-# Create a symbolic link to the TF2 server files for easier volume mounting
-RUN ln -s ${HOME}/serverfiles/tf /tf
 
 # Switch to the steam user for security reasons
 USER ${USER}

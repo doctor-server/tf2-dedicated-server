@@ -1,5 +1,6 @@
 services:
   tf2-demo-server:
+    container_name: tf2-demo-server
     image: tf2-dedicated-server:local
     command: ./srcds_run -console -game tf +sv_pure 1 +randommap +maxplayers 24
     ports:
