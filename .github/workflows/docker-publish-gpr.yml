@@ -46,12 +46,11 @@ jobs:
           fi
 
       - name: Check if tag exists
+        if: github.event_name != 'workflow_dispatch'
         id: tag-exists
         run: |
           if docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.tag }}; then
             echo "exists=true" >> $GITHUB_ENV
-          else
-            echo "exists=false" >> $GITHUB_ENV
           fi
 
       - name: Free up disk space
