@@ -9,3 +9,6 @@ services:
       - ./tf/cfg:/tf/cfg
       - ./tf/maps:/tf/maps
       - ./tf/materials:/tf/materials
+    restart: always
+    tty: true
+    stdin_open: true
