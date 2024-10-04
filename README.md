@@ -17,7 +17,7 @@ To install the TF2 dedicated server from the command line, use one of the follow
 docker pull ghcr.io/doctor-server/tf2-dedicated-server:latest
 ```
 
-or, use `slim` tag for smaller image size and faster deployment.
+or, use `slim` tag for smaller image size and faster deployment. (Recommended)
 
 ```sh
 docker pull ghcr.io/doctor-server/tf2-dedicated-server:slim
@@ -25,7 +25,9 @@ docker pull ghcr.io/doctor-server/tf2-dedicated-server:slim
 
 ## Initialization (tag: `latest`)
 
-Copy the folder to the local tf directory
+### Step 1: Copy Server Files
+
+First, create a temporary container to copy the necessary server files to your local `tf` directory:
 
 ```
 docker create --name tf2-temp-server ghcr.io/doctor-server/tf2-dedicated-server:latest sleep infinity
@@ -34,6 +36,8 @@ docker cp tf2-temp-server:/home/steam/serverfiles/tf/maps ./tf
 docker cp tf2-temp-server:/home/steam/serverfiles/tf/materials ./tf
 docker rm tf2-temp-server
 ```
+
+### Step 2: Docker Compose Configuration
 
 To run the TF2 server using Docker Compose, add the following service configuration to your `docker-compose.yml` file:
 
@@ -53,7 +57,9 @@ services:
 
 ## Initialization (tag: `slim`)
 
-Copy the folder to the local tf directory
+### Step 1: Copy Server Files
+
+First, create a temporary container to copy the necessary server files to your local `tf` directory:
 
 ```
 docker create --name tf2-temp-server ghcr.io/doctor-server/tf2-dedicated-server:slim sleep infinity
@@ -62,6 +68,12 @@ docker cp tf2-temp-server:/home/steam/serverfiles/tf/maps ./tf
 docker cp tf2-temp-server:/home/steam/serverfiles/tf/materials ./tf
 docker rm tf2-temp-server
 ```
+
+### Step 2: Add Maps
+
+Ensure you add at least one map to the `maps` folder in your local `tf` directory.
+
+### Step 3: Docker Compose Configuration
 
 To run the TF2 server using Docker Compose, add the following service configuration to your `docker-compose.yml` file:
 
