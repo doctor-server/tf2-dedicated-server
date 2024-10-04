@@ -15,7 +15,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     strategy:
       matrix:
@@ -57,7 +57,7 @@ jobs:
         if: env.exists == 'false' || github.event_name == 'workflow_dispatch'
         run: |
           sudo rm -rf /usr/local/lib/android || true
-        # sudo rm -rf /usr/share/dotnet || true
+          sudo rm -rf /usr/share/dotnet || true
 
       - name: Set up Docker Buildx
         if: env.exists == 'false' || github.event_name == 'workflow_dispatch'
