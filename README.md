@@ -53,6 +53,9 @@ services:
       - ./tf/cfg:/tf/cfg
       - ./tf/maps:/tf/maps
       - ./tf/materials:/tf/materials
+    restart: always
+    tty: true
+    stdin_open: true
 ```
 
 ## Initialization (tag: `slim`)
@@ -89,6 +92,29 @@ services:
       - ./tf/cfg:/tf/cfg
       - ./tf/maps:/tf/maps
       - ./tf/materials:/tf/materials
+    restart: always
+    tty: true
+    stdin_open: true
+```
+
+## Usage
+
+### Start the Server
+To start the TF2 dedicated server, run the following command:
+```sh
+docker compose up -d
+```
+
+### Attach to the Server
+To attach to the running container, use:
+```sh
+docker attach <container_name>
+```
+
+### Detach from the Server
+To detach from the container without stopping it, use the key combination:
+```
+Ctrl + P, Ctrl + Q
 ```
 
 ## Development
