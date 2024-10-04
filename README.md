@@ -11,11 +11,19 @@
 
 ## Installation
 
-To install the TF2 dedicated server from the command line, use the following command:
+To install the TF2 dedicated server from the command line, use one of the following commands:
 
 ```sh
 docker pull ghcr.io/doctor-server/tf2-dedicated-server:latest
 ```
+
+or, use `slim` tag for smaller image size and faster deployment.
+
+```sh
+docker pull ghcr.io/doctor-server/tf2-dedicated-server:slim
+```
+
+## Initialization (tag: `latest`)
 
 Copy the folder to the local tf directory
 
@@ -43,7 +51,37 @@ services:
       - ./tf/materials:/tf/materials
 ```
 
+## Initialization (tag: `slim`)
+
+Copy the folder to the local tf directory
+
+```
+docker create --name tf2-temp-server ghcr.io/doctor-server/tf2-dedicated-server:slim sleep infinity
+docker cp tf2-temp-server:/home/steam/serverfiles/tf/cfg ./tf
+docker cp tf2-temp-server:/home/steam/serverfiles/tf/maps ./tf
+docker cp tf2-temp-server:/home/steam/serverfiles/tf/materials ./tf
+docker rm tf2-temp-server
+```
+
+To run the TF2 server using Docker Compose, add the following service configuration to your `docker-compose.yml` file:
+
+```yml
+services:
+  tf2-demo-server:
+    image: ghcr.io/doctor-server/tf2-dedicated-server:slim
+    command: ./srcds_run -console -game tf +sv_pure 1 +randommap +maxplayers 24
+    ports:
+      - "27015:27015/tcp"
+      - "27015:27015/udp"
+    volumes:
+      - ./tf/cfg:/tf/cfg
+      - ./tf/maps:/tf/maps
+      - ./tf/materials:/tf/materials
+```
+
 ## Development
+
+> This section is for github developer
 
 ### Get Remote Build ID
 
@@ -67,7 +105,11 @@ python remote_buildid.py
 To build the Docker image locally, run the following command:
 
 ```sh
-docker build -t tf2-dedicated-server:local --build-arg remote_buildid=<remote_buildid> .
+docker build -t tf2-dedicated-server:latest --build-arg remote_buildid=<remote_buildid> --build-arg tag=latest .
+```
+
+```sh
+docker build -t tf2-dedicated-server:slim --build-arg remote_buildid=<remote_buildid> --build-arg tag=slim .
 ```
 
 ### Running the Demo TF2 Server Locally
