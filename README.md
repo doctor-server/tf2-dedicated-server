@@ -2,7 +2,14 @@
 
 [![Publish Docker Image (GPR)](https://github.com/doctor-server/tf2-dedicated-server/actions/workflows/docker-publish-gpr.yml/badge.svg?branch=main)](https://github.com/doctor-server/tf2-dedicated-server/actions/workflows/docker-publish-gpr.yml)
 
-### Installation
+| Image Name                                 | Image Tag | Image Size  |
+|--------------------------------------------|-----------|------------:|
+| ghcr.io/doctor-server/tf2-dedicated-server | `latest`  |  12.53 GB   |
+| ghcr.io/doctor-server/tf2-dedicated-server | `slim`    |   4.04 GB   |
+
+> `slim` removes unnecessary files like maps, which helps reduce the image size.
+
+## Installation
 
 To install the TF2 dedicated server from the command line, use the following command:
 
@@ -10,18 +17,30 @@ To install the TF2 dedicated server from the command line, use the following com
 docker pull ghcr.io/doctor-server/tf2-dedicated-server:latest
 ```
 
-### Usage
+Copy the folder to the local tf directory
+
+```
+docker create --name tf2-temp-server ghcr.io/doctor-server/tf2-dedicated-server:latest sleep infinity
+docker cp tf2-temp-server:/home/steam/serverfiles/tf/cfg ./tf
+docker cp tf2-temp-server:/home/steam/serverfiles/tf/maps ./tf
+docker cp tf2-temp-server:/home/steam/serverfiles/tf/materials ./tf
+docker rm tf2-temp-server
+```
 
 To run the TF2 server using Docker Compose, add the following service configuration to your `docker-compose.yml` file:
 
 ```yml
 services:
-  tf2-server:
+  tf2-demo-server:
     image: ghcr.io/doctor-server/tf2-dedicated-server:latest
     command: ./srcds_run -console -game tf +sv_pure 1 +randommap +maxplayers 24
     ports:
       - "27015:27015/tcp"
       - "27015:27015/udp"
+    volumes:
+      - ./tf/cfg:/tf/cfg
+      - ./tf/maps:/tf/maps
+      - ./tf/materials:/tf/materials
 ```
 
 ## Development

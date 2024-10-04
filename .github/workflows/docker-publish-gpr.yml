@@ -10,11 +10,16 @@ env:
   IMAGE_NAME: doctor-server/tf2-dedicated-server
   remote_buildid: 0
   exists: 'false'
+  tag: null
 
 jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+
+    strategy:
+      matrix:
+        tag: [latest, slim]
 
     steps:
       - uses: actions/checkout@v4
@@ -34,11 +39,16 @@ jobs:
         run: |
           remote_buildid=$(python remote_buildid.py)
           echo "remote_buildid=$remote_buildid" >> $GITHUB_ENV
+          if [ "${{ matrix.tag }}" == "latest" ]; then
+            echo "tag=${remote_buildid}" >> $GITHUB_ENV
+          else
+            echo "tag=${remote_buildid}-${{ matrix.tag }}" >> $GITHUB_ENV
+          fi
 
       - name: Check if tag exists
         id: tag-exists
         run: |
-          if docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.remote_buildid }}; then
+          if docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.tag }}; then
             echo "exists=true" >> $GITHUB_ENV
           else
             echo "exists=false" >> $GITHUB_ENV
@@ -69,8 +79,8 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=raw,value=latest
-            type=raw,value=${{ env.remote_buildid }}
+            type=raw,value=${{ matrix.tag }}
+            type=raw,value=${{ env.tag }}
 
       - name: Push Docker image
         if: env.exists == 'false' || github.event_name == 'workflow_dispatch'
@@ -82,4 +92,5 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           annotations: ${{ steps.meta.outputs.annotations }}
           build-args: |
+            tag=${{ matrix.tag }}
             remote_buildid=${{ env.remote_buildid }}
