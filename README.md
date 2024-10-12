@@ -123,20 +123,21 @@ Ctrl + P, Ctrl + Q
 
 ### Get Remote Build ID
 
-#### Create a virtual environment
+#### Build the Docker Image
 
 ```sh
-python -m venv venv
-pip install -r requirements.txt
+docker build -f Dockerfile.buildid -t remote-buildid:232250 --build-arg APP_ID=232250 .
 ```
 
-#### Get the remote build ID
+#### Retrieve the Remote Build ID
+
+Run the following command to get the build ID from the Docker container:
 
 ```sh
-python remote_buildid.py
+docker run --rm remote-buildid:232250 sh -c "cat buildid.txt"
 ```
 
-> 15386092
+> 16015580
 
 ### Building the Image
 
