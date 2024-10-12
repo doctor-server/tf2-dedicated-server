@@ -41,6 +41,9 @@ jobs:
             echo "tag=${remote_buildid}-${{ matrix.tag }}" >> $GITHUB_ENV
           fi
 
+      - name: Remove Docker image
+        run: docker rmi remote-buildid:232250
+
       - name: Check if tag exists
         if: github.event_name != 'workflow_dispatch'
         id: tag-exists
