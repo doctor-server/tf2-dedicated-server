@@ -24,20 +24,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+      - name: Build (Dockerfile.buildid)
+        run: docker build -f Dockerfile.buildid -t remote-buildid:232250 --build-arg APP_ID=232250 .
 
-      - name: Run remote_buildid.py and save output
+      - name: Find the Remote buildid
         id: remote-buildid
         run: |
-          remote_buildid=$(python remote_buildid.py)
+          remote_buildid=$(docker run --rm remote-buildid:232250 sh -c "cat buildid.txt")
           echo "remote_buildid=$remote_buildid" >> $GITHUB_ENV
           if [ "${{ matrix.tag }}" == "latest" ]; then
             echo "tag=${remote_buildid}" >> $GITHUB_ENV
@@ -59,10 +55,6 @@ jobs:
           sudo rm -rf /usr/local/lib/android || true
           sudo rm -rf /usr/share/dotnet || true
           sudo rm -rf "$AGENT_TOOLSDIRECTORY" || true
-
-      - name: Set up Docker Buildx
-        if: env.exists == 'false' || github.event_name == 'workflow_dispatch'
-        uses: docker/setup-buildx-action@v3
 
       - name: Log in to the Container registry
         if: env.exists == 'false' || github.event_name == 'workflow_dispatch'
