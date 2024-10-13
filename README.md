@@ -2,6 +2,9 @@
 
 [![Publish Docker Image (GPR)](https://github.com/doctor-server/tf2-dedicated-server/actions/workflows/docker-publish-gpr.yml/badge.svg?branch=main)](https://github.com/doctor-server/tf2-dedicated-server/actions/workflows/docker-publish-gpr.yml)
 
+This repository uses Docker and SteamCMD to download and check for updates to the TF2 dedicated server.
+If there's an update, it pushes the latest Docker image to the GitHub Docker registry.
+
 | Image Name                                 | Image Tag | Image Size  |
 |--------------------------------------------|-----------|------------:|
 | ghcr.io/doctor-server/tf2-dedicated-server | `latest`  |  12.53 GB   |
