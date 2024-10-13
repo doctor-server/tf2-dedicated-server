@@ -44,6 +44,12 @@ jobs:
       - name: Remove Docker image
         run: docker rmi remote-buildid:232250
 
+      - name: Free up disk space
+        run: |
+          sudo rm -rf /usr/local/lib/android || true
+          sudo rm -rf /usr/share/dotnet || true
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY" || true
+
       - name: Check if tag exists
         if: github.event_name != 'workflow_dispatch'
         id: tag-exists
@@ -51,13 +57,6 @@ jobs:
           if docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.tag }}; then
             echo "exists=true" >> $GITHUB_ENV
           fi
-
-      - name: Free up disk space
-        if: env.exists == 'false' || github.event_name == 'workflow_dispatch'
-        run: |
-          sudo rm -rf /usr/local/lib/android || true
-          sudo rm -rf /usr/share/dotnet || true
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY" || true
 
       - name: Log in to the Container registry
         if: env.exists == 'false' || github.event_name == 'workflow_dispatch'
