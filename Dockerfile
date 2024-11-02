@@ -18,12 +18,12 @@ RUN steamcmd +runscript ${HOME}/update_tf2_ds.txt
 COPY validate_buildid.sh ${HOME}/validate_buildid.sh
 
 # Set the remote build ID as an argument and validate it using the script
-ARG remote_buildid
-RUN chmod +x ${HOME}/validate_buildid.sh && ${HOME}/validate_buildid.sh ${remote_buildid}
+ARG REMOTE_BUILDID
+RUN chmod +x ${HOME}/validate_buildid.sh && ${HOME}/validate_buildid.sh ${REMOTE_BUILDID}
 
 # Remove all map files if the 'slim' tag is specified
-ARG tag
-RUN if [ "${tag}" = "slim" ]; then rm -rf ${HOME}/serverfiles/tf/maps/*; fi
+ARG TAG
+RUN if [ "${TAG}" = "slim" ]; then rm -rf ${HOME}/serverfiles/tf/maps/*; fi
 
 
 # Use the official Ubuntu 22.04 base image
