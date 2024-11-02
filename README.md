@@ -1,14 +1,19 @@
 # tf2-dedicated-server
 
 [![Publish Docker Image (GPR)](https://github.com/doctor-server/tf2-dedicated-server/actions/workflows/docker-publish-gpr.yml/badge.svg?branch=main)](https://github.com/doctor-server/tf2-dedicated-server/actions/workflows/docker-publish-gpr.yml)
+[![Publish Docker Image (Hub)](https://github.com/doctor-server/tf2-dedicated-server/actions/workflows/docker-publish-hub.yml/badge.svg)](https://github.com/doctor-server/tf2-dedicated-server/actions/workflows/docker-publish-hub.yml)
+![Docker Image Version](https://img.shields.io/docker/v/doctorserver/tf2-dedicated-server)
+[![Docker Image Size](https://img.shields.io/docker/image-size/doctorserver/tf2-dedicated-server)](https://hub.docker.com/repository/docker/doctorserver/tf2-dedicated-server/general)
+![Docker Pulls](https://img.shields.io/docker/pulls/doctorserver/tf2-dedicated-server)
 
 This repository uses Docker and SteamCMD to download and check for updates to the TF2 dedicated server.
-If there's an update, it pushes the latest Docker image to the GitHub Docker registry.
+If there's an update, it pushes the latest Docker image to the [Docker Hub](https://hub.docker.com/repository/docker/doctorserver/tf2-dedicated-server)
+and [GitHub Docker registry](https://github.com/doctor-server/tf2-dedicated-server/pkgs/container/tf2-dedicated-server).
 
 | Image Name                                 | Image Tag | Image Size  |
 |--------------------------------------------|-----------|------------:|
-| ghcr.io/doctor-server/tf2-dedicated-server | `latest`  |  12.53 GB   |
-| ghcr.io/doctor-server/tf2-dedicated-server | `slim`    |   4.04 GB   |
+| doctorserver/tf2-dedicated-server          | `latest`  | ![Docker Image Size (tag)](https://img.shields.io/docker/image-size/doctorserver/tf2-dedicated-server/latest) |
+| doctorserver/tf2-dedicated-server          | `slim`    | ![Docker Image Size (tag)](https://img.shields.io/docker/image-size/doctorserver/tf2-dedicated-server/slim) |
 
 > `slim` removes unnecessary files like maps, which helps reduce the image size.
 
@@ -17,13 +22,13 @@ If there's an update, it pushes the latest Docker image to the GitHub Docker reg
 To install the TF2 dedicated server from the command line, use one of the following commands:
 
 ```sh
-docker pull ghcr.io/doctor-server/tf2-dedicated-server:latest
+docker pull doctorserver/tf2-dedicated-server:latest
 ```
 
 or, use `slim` tag for smaller image size and faster deployment. (Recommended)
 
 ```sh
-docker pull ghcr.io/doctor-server/tf2-dedicated-server:slim
+docker pull doctorserver/tf2-dedicated-server:slim
 ```
 
 ## Initialization (tag: `latest`)
@@ -33,7 +38,7 @@ docker pull ghcr.io/doctor-server/tf2-dedicated-server:slim
 First, create a temporary container to copy the necessary server files to your local `tf` directory:
 
 ```
-docker create --name tf2-temp-server ghcr.io/doctor-server/tf2-dedicated-server:latest sleep infinity
+docker create --name tf2-temp-server doctorserver/tf2-dedicated-server:latest sleep infinity
 docker cp tf2-temp-server:/home/steam/serverfiles/tf/cfg ./tf
 docker cp tf2-temp-server:/home/steam/serverfiles/tf/maps ./tf
 docker cp tf2-temp-server:/home/steam/serverfiles/tf/materials ./tf
@@ -47,7 +52,7 @@ To run the TF2 server using Docker Compose, add the following service configurat
 ```yml
 services:
   tf2-demo-server:
-    image: ghcr.io/doctor-server/tf2-dedicated-server:latest
+    image: doctorserver/tf2-dedicated-server:latest
     command: ./srcds_run -console -game tf +sv_pure 1 +randommap +maxplayers 24
     ports:
       - "27015:27015/tcp"
@@ -68,7 +73,7 @@ services:
 First, create a temporary container to copy the necessary server files to your local `tf` directory:
 
 ```
-docker create --name tf2-temp-server ghcr.io/doctor-server/tf2-dedicated-server:slim sleep infinity
+docker create --name doctorserver/tf2-dedicated-server:slim sleep infinity
 docker cp tf2-temp-server:/home/steam/serverfiles/tf/cfg ./tf
 docker cp tf2-temp-server:/home/steam/serverfiles/tf/maps ./tf
 docker cp tf2-temp-server:/home/steam/serverfiles/tf/materials ./tf
@@ -86,7 +91,7 @@ To run the TF2 server using Docker Compose, add the following service configurat
 ```yml
 services:
   tf2-demo-server:
-    image: ghcr.io/doctor-server/tf2-dedicated-server:slim
+    image: doctorserver/tf2-dedicated-server:slim
     command: ./srcds_run -console -game tf +sv_pure 1 +randommap +maxplayers 24
     ports:
       - "27015:27015/tcp"
