@@ -87,4 +87,4 @@ jobs:
           annotations: ${{ steps.meta.outputs.annotations }}
           build-args: |
             TAG=${{ matrix.tag }}
-            remote_buildid=${{ env.REMOTE_BUILDID }}
+            REMOTE_BUILDID=${{ env.REMOTE_BUILDID }}
