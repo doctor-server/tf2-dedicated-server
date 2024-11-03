@@ -3,6 +3,7 @@
 [![Publish Docker Image (GPR)](https://github.com/doctor-server/tf2-dedicated-server/actions/workflows/docker-publish-gpr.yml/badge.svg?branch=main)](https://github.com/doctor-server/tf2-dedicated-server/actions/workflows/docker-publish-gpr.yml)
 [![Publish Docker Image (Hub)](https://github.com/doctor-server/tf2-dedicated-server/actions/workflows/docker-publish-hub.yml/badge.svg)](https://github.com/doctor-server/tf2-dedicated-server/actions/workflows/docker-publish-hub.yml)
 ![Docker Image Version](https://img.shields.io/docker/v/doctorserver/tf2-dedicated-server)
+![Docker Stars](https://img.shields.io/docker/stars/doctorserver/tf2-dedicated-server)
 ![Docker Pulls](https://img.shields.io/docker/pulls/doctorserver/tf2-dedicated-server)
 
 This repository uses Docker and SteamCMD to download and check for updates to the TF2 dedicated server.
