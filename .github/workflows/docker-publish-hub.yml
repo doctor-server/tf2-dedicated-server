@@ -33,7 +33,7 @@ jobs:
       - name: Find the Remote buildid
         id: remote-buildid
         run: |
-          REMOTE_BUILDID=$(docker run --rm remote-buildid:${{ env.APP_ID }} sh -c "cat buildid.txt")
+          REMOTE_BUILDID=$(docker run --rm remote-buildid:${{ env.APP_ID }})
           echo "REMOTE_BUILDID=$REMOTE_BUILDID" >> $GITHUB_ENV
           if [ "${{ matrix.tag }}" == "latest" ]; then
             echo "TAG=${REMOTE_BUILDID}" >> $GITHUB_ENV
