@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: doctor-server/tf2-dedicated-server
+  IMAGE_NAME: ${{ github.repository }}
   APP_ID: 232250
   REMOTE_BUILDID: 0
   TAG_EXISTS: 'false'
@@ -34,7 +34,7 @@ jobs:
       - name: Find the Remote buildid
         id: remote-buildid
         run: |
-          REMOTE_BUILDID=$(docker run --rm remote-buildid:${{ env.APP_ID }} sh -c "cat buildid.txt")
+          REMOTE_BUILDID=$(docker run --rm remote-buildid:${{ env.APP_ID }})
           echo "REMOTE_BUILDID=$REMOTE_BUILDID" >> $GITHUB_ENV
           if [ "${{ matrix.tag }}" == "latest" ]; then
             echo "TAG=${REMOTE_BUILDID}" >> $GITHUB_ENV
