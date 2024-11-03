@@ -1,16 +1,26 @@
 # https://github.com/doctor-server/steamcmd
 FROM doctorserver/steamcmd:latest AS builder
 
-# Copy the update script for the Team Fortress 2 dedicated server to the home directory
-COPY update_tf2_ds.txt ${HOME}/update_tf2_ds.txt
+# Set environment variables
+ENV APP_ID=232250
 
-# Run the SteamCMD script to update the TF2 server
+# Create the update script
+RUN cat <<EOF > ${HOME}/update_tf2_ds.txt
+@ShutdownOnFailedCommand 1
+@NoPromptForPassword 1
+force_install_dir ${HOME}/serverfiles
+login anonymous
+app_update ${APP_ID} validate
+quit
+EOF
+
+# Run the SteamCMD script
 RUN steamcmd +runscript ${HOME}/update_tf2_ds.txt
 
 # Set the remote build ID as an argument and validate it using the script
 ARG REMOTE_BUILDID
 COPY validate_buildid.sh ${HOME}/validate_buildid.sh
-RUN chmod +x ${HOME}/validate_buildid.sh && ${HOME}/validate_buildid.sh ${REMOTE_BUILDID}
+RUN chmod +x ${HOME}/validate_buildid.sh && ${HOME}/validate_buildid.sh ${APP_ID} ${REMOTE_BUILDID}
 
 # Remove all map files if the 'slim' tag is specified
 ARG TAG
