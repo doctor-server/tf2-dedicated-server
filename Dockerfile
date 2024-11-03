@@ -5,7 +5,7 @@ FROM doctorserver/steamcmd:latest AS builder
 ENV APP_ID=232250
 
 # Create the update script
-RUN cat <<EOF > ${HOME}/update_tf2_ds.txt
+RUN cat <<EOF > ${HOME}/script.txt
 @ShutdownOnFailedCommand 1
 @NoPromptForPassword 1
 force_install_dir ${HOME}/serverfiles
@@ -15,7 +15,7 @@ quit
 EOF
 
 # Run the SteamCMD script
-RUN steamcmd +runscript ${HOME}/update_tf2_ds.txt
+RUN steamcmd +runscript ${HOME}/script.txt
 
 # Set the remote build ID as an argument and validate it using the script
 ARG REMOTE_BUILDID
@@ -25,6 +25,7 @@ RUN chmod +x ${HOME}/validate_buildid.sh && ${HOME}/validate_buildid.sh ${APP_ID
 # Remove all map files if the 'slim' tag is specified
 ARG TAG
 RUN if [ "${TAG}" = "slim" ]; then rm -rf ${HOME}/serverfiles/tf/maps/*; fi
+
 
 # https://github.com/doctor-server/steamcmd
 FROM doctorserver/steamcmd:latest
