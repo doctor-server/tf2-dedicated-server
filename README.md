@@ -141,7 +141,7 @@ docker build -f Dockerfile.buildid -t remote-buildid:232250 --build-arg APP_ID=2
 Run the following command to get the build ID from the Docker container:
 
 ```sh
-docker run --rm remote-buildid:232250 sh -c "cat buildid.txt"
+docker run --rm remote-buildid:232250
 ```
 
 > 16015580
@@ -151,11 +151,11 @@ docker run --rm remote-buildid:232250 sh -c "cat buildid.txt"
 To build the Docker image locally, run the following command:
 
 ```sh
-docker build -t tf2-dedicated-server:latest --build-arg remote_buildid=<remote_buildid> --build-arg tag=latest .
+docker build -t tf2-dedicated-server:latest --build-arg REMOTE_BUILDID=<remote_buildid> --build-arg TAG=latest .
 ```
 
 ```sh
-docker build -t tf2-dedicated-server:slim --build-arg remote_buildid=<remote_buildid> --build-arg tag=slim .
+docker build -t tf2-dedicated-server:slim --build-arg REMOTE_BUILDID=<remote_buildid> --build-arg TAG=slim .
 ```
 
 ### Running the Demo TF2 Server Locally
