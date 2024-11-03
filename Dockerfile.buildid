@@ -1,7 +1,6 @@
 # Dockerfile for fetching the remote buildid
 
-# Use the steamcmd image based on Ubuntu 22.04
-FROM steamcmd/steamcmd:ubuntu-22
+FROM doctorserver/steamcmd:latest
 
 ARG APP_ID
 
@@ -13,5 +12,5 @@ RUN steamcmd +login anonymous +app_info_update 1 +app_info_print ${APP_ID} +quit
     && grep -zoP '"public"\s*{\s*"buildid"\s*"\K\d+(?=")' output.txt > buildid.txt \
     && if [ ! -s buildid.txt ]; then echo "buildid.txt is empty" && exit 1; fi
 
-# Set an empty entrypoint
-ENTRYPOINT []
+# Print the remote buildid
+ENTRYPOINT ["cat", "buildid.txt"]
