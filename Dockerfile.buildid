@@ -11,7 +11,7 @@ RUN steamcmd +login anonymous +app_info_update 1 +app_info_print ${APP_ID} +quit
 
 # Use grep to extract the buildid from the output and save it to buildid.txt
 # If buildid.txt is empty, print an error message and exit with a non-zero status to fail the build
-RUN grep -zoP '"public"\s*{\s*"buildid"\s*"\K\d+(?=")' output.txt > buildid.txt \
+RUN grep -zoP '"public"\s*{\s*"buildid"\s*"\K\d+(?=")' output.txt | tr -d '\0' > buildid.txt \
     && if [ ! -s buildid.txt ]; then echo "buildid.txt is empty" && exit 1; fi
 
 # Print the remote buildid
