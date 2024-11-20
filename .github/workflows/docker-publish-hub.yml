@@ -30,7 +30,7 @@ jobs:
       - name: Build (Dockerfile.buildid) with retries
         run: |
           for i in {1..3}; do
-            docker build --no-cache -f Dockerfile.buildid -t remote-buildid:${{ env.APP_ID }} --build-arg APP_ID=${{ env.APP_ID }} . && break || sleep 10
+            timeout 300 docker build --no-cache -f Dockerfile.buildid -t remote-buildid:${{ env.APP_ID }} --build-arg APP_ID=${{ env.APP_ID }} . && break || sleep 10
           done
 
       - name: Find the Remote buildid
