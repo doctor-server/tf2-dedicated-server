@@ -134,7 +134,7 @@ Ctrl + P, Ctrl + Q
 #### Build the Docker Image
 
 ```sh
-docker build -f Dockerfile.buildid -t remote-buildid:232250 --build-arg APP_ID=232250 .
+docker build --no-cache -f Dockerfile.buildid -t remote-buildid:232250 --build-arg APP_ID=232250 .
 ```
 
 #### Retrieve the Remote Build ID
