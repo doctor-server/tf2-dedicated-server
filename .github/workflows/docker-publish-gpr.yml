@@ -27,7 +27,7 @@ jobs:
 
       - name: Fetch depot JSON file
         run: |
-          curl -L -o depot.json https://github.com/doctor-server/app-depots/raw/main/depots/${{ env.APP_ID }}.json
+          curl -L -f -o depot.json https://github.com/doctor-server/app-depots/raw/main/depots/${{ env.APP_ID }}.json
 
       - name: Extract buildid
         id: extract_buildid
