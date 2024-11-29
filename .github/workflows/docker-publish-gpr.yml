@@ -35,9 +35,9 @@ jobs:
           buildid=$(jq -r '.branches.public.buildid' depot.json)
           echo "REMOTE_BUILDID=$buildid" >> $GITHUB_ENV
           if [ "${{ matrix.tag }}" == "latest" ]; then
-            echo "TAG=${REMOTE_BUILDID}" >> $GITHUB_ENV
+            echo "TAG=$buildid" >> $GITHUB_ENV
           else
-            echo "TAG=${REMOTE_BUILDID}-${{ matrix.tag }}" >> $GITHUB_ENV
+            echo "TAG=$buildid-${{ matrix.tag }}" >> $GITHUB_ENV
           fi
 
       - name: Check if tag exists
