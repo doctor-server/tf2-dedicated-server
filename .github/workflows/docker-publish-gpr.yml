@@ -25,34 +25,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-        
-      - name: Build (Dockerfile.buildid) with retries
+      - name: Fetch depot JSON file
         run: |
-          for i in {1..3}; do
-            timeout 300 docker build --no-cache -f Dockerfile.buildid -t remote-buildid:${{ env.APP_ID }} --build-arg APP_ID=${{ env.APP_ID }} . && break || sleep 10
-          done
+          curl -o depot.json https://github.com/doctor-server/app-depots/raw/main/depots/${{ env.APP_ID }}.json
 
-      - name: Find the Remote buildid
-        id: remote-buildid
+      - name: Extract buildid
+        id: extract_buildid
         run: |
-          REMOTE_BUILDID=$(docker run --rm remote-buildid:${{ env.APP_ID }})
-          echo "REMOTE_BUILDID=$REMOTE_BUILDID" >> $GITHUB_ENV
+          buildid=$(jq -r '.branches.public.buildid' depot.json)
+          echo "REMOTE_BUILDID=$buildid" >> $GITHUB_ENV
           if [ "${{ matrix.tag }}" == "latest" ]; then
             echo "TAG=${REMOTE_BUILDID}" >> $GITHUB_ENV
           else
             echo "TAG=${REMOTE_BUILDID}-${{ matrix.tag }}" >> $GITHUB_ENV
           fi
-
-      - name: Remove Docker image
-        run: docker rmi remote-buildid:${{ env.APP_ID }}
-
-      - name: Free up disk space
-        run: |
-          sudo rm -rf /usr/local/lib/android || true
-          sudo rm -rf /usr/share/dotnet || true
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY" || true
 
       - name: Check if tag exists
         if: github.event_name != 'workflow_dispatch'
@@ -61,6 +47,15 @@ jobs:
           if docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}; then
             echo "TAG_EXISTS=true" >> $GITHUB_ENV
           fi
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Free up disk space
+        run: |
+          sudo rm -rf /usr/local/lib/android || true
+          sudo rm -rf /usr/share/dotnet || true
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY" || true
 
       - name: Log in to the Container registry
         if: env.TAG_EXISTS == 'false' || github.event_name == 'workflow_dispatch'
