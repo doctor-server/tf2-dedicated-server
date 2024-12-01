@@ -131,21 +131,9 @@ Ctrl + P, Ctrl + Q
 
 ### Get Remote Build ID
 
-#### Build the Docker Image
+Go to the following URL: https://github.com/doctor-server/app-depots/blob/main/depots/232250.json
 
-```sh
-docker build --no-cache -f Dockerfile.buildid -t remote-buildid:232250 --build-arg APP_ID=232250 .
-```
-
-#### Retrieve the Remote Build ID
-
-Run the following command to get the build ID from the Docker container:
-
-```sh
-docker run --rm remote-buildid:232250
-```
-
-> 16015580
+In the JSON file, find the value of `depots.branches.public.buildid`.
 
 ### Building the Image
 
