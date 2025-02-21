@@ -25,14 +25,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Fetch depot JSON file
-        run: |
-          curl -L -f -o depot.json https://github.com/doctor-server/app-depots/raw/main/depots/${{ env.APP_ID }}.json
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
 
-      - name: Extract buildid
-        id: extract_buildid
+      - name: Install dependencies
         run: |
-          buildid=$(jq -r '.branches.public.buildid' depot.json)
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run remote_buildid.py and save output
+        id: remote-buildid
+        run: |
+          buildid=$(python remote_buildid.py)
           echo "REMOTE_BUILDID=$buildid" >> $GITHUB_ENV
           if [ "${{ matrix.tag }}" == "latest" ]; then
             echo "TAG=$buildid" >> $GITHUB_ENV
@@ -60,7 +66,7 @@ jobs:
           remove-haskell: 'true'
           remove-codeql: 'true'
           remove-docker-images: 'true'
-        
+
       - name: Log in to the Container registry
         if: env.TAG_EXISTS == 'false' || github.event_name == 'workflow_dispatch'
         uses: docker/login-action@v3
