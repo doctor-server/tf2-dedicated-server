@@ -53,9 +53,6 @@ jobs:
             echo "TAG_EXISTS=true" >> $GITHUB_ENV
           fi
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: Maximize build space
         uses: easimon/maximize-build-space@master
         with:
@@ -65,6 +62,9 @@ jobs:
           remove-haskell: 'true'
           remove-codeql: 'true'
           remove-docker-images: 'true'
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Log in to the Container registry
         if: env.TAG_EXISTS == 'false' || github.event_name == 'workflow_dispatch'
