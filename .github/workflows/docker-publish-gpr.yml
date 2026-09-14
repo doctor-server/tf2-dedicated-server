@@ -23,22 +23,20 @@ jobs:
         tag: [latest, slim]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4
         with:
-          python-version: '3.x'
+          activate-environment: true
 
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+        run: uv pip install -r requirements.txt
 
       - name: Run remote_buildid.py and save output
         id: remote-buildid
         run: |
-          buildid=$(python remote_buildid.py)
+          buildid=$(uv run remote_buildid.py)
           echo "REMOTE_BUILDID=$buildid" >> $GITHUB_ENV
           if [ "${{ matrix.tag }}" == "latest" ]; then
             echo "TAG=$buildid" >> $GITHUB_ENV
