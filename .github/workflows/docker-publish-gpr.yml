@@ -100,3 +100,11 @@ jobs:
           build-args: |
             TAG=${{ matrix.tag }}
             REMOTE_BUILDID=${{ env.REMOTE_BUILDID }}
+
+  workflow-keepalive:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - uses: liskin/gh-workflow-keepalive@v1
