@@ -76,7 +76,7 @@ jobs:
       - name: Extract metadata (tags, labels) for Docker
         if: env.TAG_EXISTS == 'false' || github.event_name == 'workflow_dispatch'
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.IMAGE_NAME }}
           tags: |
