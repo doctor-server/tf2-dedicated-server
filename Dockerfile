@@ -8,6 +8,7 @@ ENV APP_ID=232250
 RUN cat <<EOF > ${HOME}/script.txt
 @ShutdownOnFailedCommand 1
 @NoPromptForPassword 1
+@sSteamCmdForcePlatformType linux
 force_install_dir ${HOME}/serverfiles
 login anonymous
 app_update ${APP_ID} validate
